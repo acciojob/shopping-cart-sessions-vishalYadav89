@@ -1,10 +1,15 @@
+// 🔥 Ensure clean state for tests (IMPORTANT for Cypress)
+if (!sessionStorage.getItem("cart")) {
+  sessionStorage.setItem("cart", JSON.stringify([]));
+}
+
 // Product data
 const products = [
-  { id: 1, name: "Product 1", price:10 },
-  { id: 2, name: "Product 2", price:20 },
-  { id: 3, name: "Product 3", price:30 },
-  { id: 4, name: "Product 4", price:40 },
-  { id: 5, name: "Product 5", price:50 },
+  { id: 1, name: "Product 1", price: 10 },
+  { id: 2, name: "Product 2", price: 20 },
+  { id: 3, name: "Product 3", price: 30 },
+  { id: 4, name: "Product 4", price: 40 },
+  { id: 5, name: "Product 5", price: 50 },
 ];
 
 // DOM elements
@@ -12,18 +17,18 @@ const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// 🔹 Get cart from sessionStorage
+// 🔹 Get cart
 function getCart() {
-  const cart = sessionStorage.getItem("cart");
-  return cart ? JSON.parse(cart) : [];
+  const data = sessionStorage.getItem("cart");
+  return data ? JSON.parse(data) : [];
 }
 
-// 🔹 Save cart to sessionStorage
+// 🔹 Save cart
 function saveCart(cart) {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// 🔹 Render product list
+// 🔹 Render products
 function renderProducts() {
   productList.innerHTML = "";
 
@@ -39,45 +44,39 @@ function renderProducts() {
   });
 }
 
-// 🔹 Render cart list
+// 🔹 Render cart
 function renderCart() {
   const cart = getCart();
   cartList.innerHTML = "";
 
-  // ✅ IMPORTANT: Do NOT add anything if empty (Cypress requirement)
+  // ❗ Keep UL empty if no items (test requirement)
   cart.forEach((item) => {
     const li = document.createElement("li");
-
     li.textContent = `${item.name} - $${item.price}`;
-
     cartList.appendChild(li);
   });
 }
 
-// 🔹 Add item to cart
+// 🔹 Add to cart
 function addToCart(productId) {
-  // ✅ ALWAYS read existing cart
-  const cart = getCart();
+  const cart = getCart(); // read existing
 
-  // ✅ find product
-  const product = products.find(p => p.id === productId);
+  const product = products.find((p) => p.id === productId);
 
-  // ✅ push (DO NOT replace)
-  cart.push(product);
+  cart.push(product); // append
 
-  // ✅ save back
-  sessionStorage.setItem("cart", JSON.stringify(cart));
+  saveCart(cart); // save
 
-  renderCart();
+  renderCart(); // update UI
 }
 
 // 🔹 Clear cart
 function clearCart() {
-  sessionStorage.removeItem("cart");
+  sessionStorage.setItem("cart", JSON.stringify([])); // safer for tests
   renderCart();
 }
 
-// 🔹 Event: Add to Cart (event delegation)
+// 🔹 Event: Add to Cart
 productList.addEventListener("click", (e) => {
   if (e.target.tagName === "BUTTON") {
     const id = Number(e.target.dataset.id);
@@ -88,6 +87,6 @@ productList.addEventListener("click", (e) => {
 // 🔹 Event: Clear Cart
 clearCartBtn.addEventListener("click", clearCart);
 
-// 🔹 Initial render (handles persistence)
+// 🔹 Initial render
 renderProducts();
 renderCart();
