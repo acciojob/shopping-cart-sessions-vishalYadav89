@@ -14,7 +14,8 @@ const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // 🔹 Get cart from sessionStorage
 function getCart() {
-  return JSON.parse(sessionStorage.getItem("cart")) || [];
+  const data = sessionStorage.getItem("cart");
+  return data ? JSON.parse(data) : [];
 }
 
 // 🔹 Save cart to sessionStorage
@@ -31,9 +32,7 @@ function renderProducts() {
 
     li.innerHTML = `
       ${product.name} - $${product.price}
-      <button class="add-to-cart-btn" data-id="${product.id}">
-        Add to Cart
-      </button>
+      <button data-id="${product.id}">Add to Cart</button>
     `;
 
     productList.appendChild(li);
@@ -45,20 +44,11 @@ function renderCart() {
   const cart = getCart();
   cartList.innerHTML = "";
 
-  // if (cart.length === 0) {
-  //   cartList.innerHTML = "<li>Cart is empty</li>";
-  //   return;
-  // }
-
+  // ✅ IMPORTANT: Do NOT add anything if empty (Cypress requirement)
   cart.forEach((item) => {
     const li = document.createElement("li");
 
-    li.innerHTML = `
-      ${item.name} - $${item.price}
-      <button class="remove-btn" data-id="${item.id}">
-        Remove
-      </button>
-    `;
+    li.textContent = `${item.name} - $${item.price}`;
 
     cartList.appendChild(li);
   });
@@ -66,20 +56,11 @@ function renderCart() {
 
 // 🔹 Add item to cart
 function addToCart(productId) {
-  const cart = getCart();
-  const product = products.find(p => p.id === productId);
+  const cart = getCart(); // get existing cart
 
-  cart.push(product);
+  const product = products.find((p) => p.id === productId);
 
-  saveCart(cart);
-  renderCart();
-}
-
-// 🔹 Remove item from cart
-function removeFromCart(productId) {
-  let cart = getCart();
-
-  cart = cart.filter(item => item.id !== productId);
+  cart.push(product); // allow duplicates (as per test)
 
   saveCart(cart);
   renderCart();
@@ -91,25 +72,17 @@ function clearCart() {
   renderCart();
 }
 
-// 🔹 Event Delegation for Add to Cart
+// 🔹 Event: Add to Cart (event delegation)
 productList.addEventListener("click", (e) => {
-  if (e.target.classList.contains("add-to-cart-btn")) {
+  if (e.target.tagName === "BUTTON") {
     const id = Number(e.target.dataset.id);
     addToCart(id);
   }
 });
 
-// 🔹 Event Delegation for Remove
-cartList.addEventListener("click", (e) => {
-  if (e.target.classList.contains("remove-btn")) {
-    const id = Number(e.target.dataset.id);
-    removeFromCart(id);
-  }
-});
-
-// 🔹 Clear cart button
+// 🔹 Event: Clear Cart
 clearCartBtn.addEventListener("click", clearCart);
 
-// 🔹 Initial render (important for persistence)
+// 🔹 Initial render (handles persistence)
 renderProducts();
 renderCart();
