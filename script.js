@@ -1,8 +1,3 @@
-// 🔥 Ensure clean state for tests (IMPORTANT for Cypress)
-if (!sessionStorage.getItem("cart")) {
-  sessionStorage.setItem("cart", JSON.stringify([]));
-}
-
 // Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
@@ -49,7 +44,6 @@ function renderCart() {
   const cart = getCart();
   cartList.innerHTML = "";
 
-  // ❗ Keep UL empty if no items (test requirement)
   cart.forEach((item) => {
     const li = document.createElement("li");
     li.textContent = `${item.name} - $${item.price}`;
@@ -59,20 +53,20 @@ function renderCart() {
 
 // 🔹 Add to cart
 function addToCart(productId) {
-  const cart = getCart(); // read existing
+  const cart = getCart(); // ✅ IMPORTANT
 
-  const product = products.find((p) => p.id === productId);
+  const product = products.find(p => p.id === productId);
 
-  cart.push(product); // append
+  cart.push(product); // ✅ APPEND
 
-  saveCart(cart); // save
+  saveCart(cart); // ✅ SAVE
 
-  renderCart(); // update UI
+  renderCart();
 }
 
 // 🔹 Clear cart
 function clearCart() {
-  sessionStorage.setItem("cart", JSON.stringify([])); // safer for tests
+  sessionStorage.removeItem("cart"); // ✅ IMPORTANT
   renderCart();
 }
 
