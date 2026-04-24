@@ -14,8 +14,8 @@ const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // 🔹 Get cart from sessionStorage
 function getCart() {
-  const data = sessionStorage.getItem("cart");
-  return data ? JSON.parse(data) : [];
+  const cart = sessionStorage.getItem("cart");
+  return cart ? JSON.parse(cart) : [];
 }
 
 // 🔹 Save cart to sessionStorage
@@ -56,13 +56,18 @@ function renderCart() {
 
 // 🔹 Add item to cart
 function addToCart(productId) {
-  const cart = getCart(); // get existing cart
+  // ✅ ALWAYS read existing cart
+  const cart = getCart();
 
-  const product = products.find((p) => p.id === productId);
+  // ✅ find product
+  const product = products.find(p => p.id === productId);
 
-  cart.push(product); // allow duplicates (as per test)
+  // ✅ push (DO NOT replace)
+  cart.push(product);
 
-  saveCart(cart);
+  // ✅ save back
+  sessionStorage.setItem("cart", JSON.stringify(cart));
+
   renderCart();
 }
 
