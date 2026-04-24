@@ -45,10 +45,10 @@ function renderCart() {
   const cart = getCart();
   cartList.innerHTML = "";
 
-  if (cart.length === 0) {
-    cartList.innerHTML = "<li>Cart is empty</li>";
-    return;
-  }
+  // if (cart.length === 0) {
+  //   cartList.innerHTML = "<li>Cart is empty</li>";
+  //   return;
+  // }
 
   cart.forEach((item) => {
     const li = document.createElement("li");
