@@ -1,4 +1,3 @@
-// Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -8,45 +7,44 @@ const products = [
 ];
 
 
-// DOM elements
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
 
-// Get cart from sessionStorage
-function getCart() {
-
-  const cart = sessionStorage.getItem("cart");
-
-  return cart ? JSON.parse(cart) : [];
-
+// Initialize session storage
+if (!sessionStorage.getItem("cart")) {
+  sessionStorage.setItem("cart", JSON.stringify([]));
 }
 
 
-// Save cart to sessionStorage
-function saveCart(cart) {
+// Get cart
+function getCart() {
+  return JSON.parse(sessionStorage.getItem("cart"));
+}
 
+
+// Save cart
+function saveCart(cart) {
   sessionStorage.setItem(
     "cart",
     JSON.stringify(cart)
   );
-
 }
 
 
-// Render products
+// Show products
 function renderProducts() {
 
   productList.innerHTML = "";
 
   products.forEach(product => {
 
-    const li = document.createElement("li");
+    let li = document.createElement("li");
 
     li.innerHTML = `
       ${product.name} - $${product.price}
-      <button data-id="${product.id}">
+      <button class="add-btn" data-id="${product.id}">
         Add to Cart
       </button>
     `;
@@ -58,18 +56,18 @@ function renderProducts() {
 }
 
 
-// Render cart
+// Show cart
 function renderCart() {
-
-  const cart = getCart();
 
   cartList.innerHTML = "";
 
+  const cart = getCart();
+
   cart.forEach(item => {
 
-    const li = document.createElement("li");
+    let li = document.createElement("li");
 
-    li.textContent =
+    li.innerHTML =
       `${item.name} - $${item.price}`;
 
     cartList.appendChild(li);
@@ -79,12 +77,12 @@ function renderCart() {
 }
 
 
-// Add product to cart
+// Add product
 function addToCart(id) {
 
   let cart = getCart();
 
-  const product = products.find(
+  let product = products.find(
     p => p.id === id
   );
 
@@ -99,7 +97,6 @@ function addToCart(id) {
   saveCart(cart);
 
   renderCart();
-
 }
 
 
@@ -111,20 +108,20 @@ function clearCart() {
     JSON.stringify([])
   );
 
-  renderCart();
+  cartList.innerHTML = "";
 
 }
 
 
-// Add to cart button event
+// Button click
 productList.addEventListener(
   "click",
-  function(event) {
+  function(e){
 
-    if (event.target.tagName === "BUTTON") {
+    if(e.target.classList.contains("add-btn")){
 
-      const id = Number(
-        event.target.getAttribute("data-id")
+      let id = Number(
+        e.target.dataset.id
       );
 
       addToCart(id);
@@ -135,13 +132,13 @@ productList.addEventListener(
 );
 
 
-// Clear button event
+// Clear button
 clearCartBtn.addEventListener(
   "click",
   clearCart
 );
 
 
-// Load page
+// Initial load
 renderProducts();
 renderCart();
