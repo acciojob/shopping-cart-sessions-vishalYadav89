@@ -1,4 +1,3 @@
-// Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -7,80 +6,136 @@ const products = [
   { id: 5, name: "Product 5", price: 50 },
 ];
 
-// DOM elements
+
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
-// 🔹 Get cart
+
+// Get cart from sessionStorage
 function getCart() {
-  const data = sessionStorage.getItem("cart");
-  return data ? JSON.parse(data) : [];
+  const cart = sessionStorage.getItem("cart");
+
+  if (cart) {
+    return JSON.parse(cart);
+  }
+
+  return [];
 }
 
-// 🔹 Save cart
+
+// Save cart
 function saveCart(cart) {
   sessionStorage.setItem("cart", JSON.stringify(cart));
 }
 
-// 🔹 Render products
+
+// Display products
 function renderProducts() {
+
   productList.innerHTML = "";
 
-  products.forEach((product) => {
+  products.forEach(product => {
+
     const li = document.createElement("li");
 
     li.innerHTML = `
       ${product.name} - $${product.price}
-      <button data-id="${product.id}">Add to Cart</button>
+      <button class="add-btn" data-id="${product.id}">
+        Add to Cart
+      </button>
     `;
 
     productList.appendChild(li);
   });
 }
 
-// 🔹 Render cart
+
+
+// Display cart
 function renderCart() {
+
   const cart = getCart();
+
   cartList.innerHTML = "";
 
-  cart.forEach((item) => {
+  cart.forEach(item => {
+
     const li = document.createElement("li");
-    li.textContent = `${item.name} - $${item.price}`;
+
+    li.textContent =
+      `${item.name} - $${item.price}`;
+
     cartList.appendChild(li);
+
   });
+
 }
 
-// 🔹 Add to cart
-function addToCart(productId) {
-  const cart = getCart(); // ✅ IMPORTANT
 
-  const product = products.find(p => p.id === productId);
 
-  cart.push(product); // ✅ APPEND
+// Add product
+function addToCart(id) {
 
-  saveCart(cart); // ✅ SAVE
+  const cart = getCart();
+
+  const product = products.find(
+    product => product.id === id
+  );
+
+
+  cart.push({
+    id: product.id,
+    name: product.name,
+    price: product.price
+  });
+
+
+  saveCart(cart);
 
   renderCart();
 }
 
-// 🔹 Clear cart
+
+
+// Clear cart
 function clearCart() {
-  sessionStorage.removeItem("cart"); // ✅ IMPORTANT
+
+  sessionStorage.setItem(
+    "cart",
+    JSON.stringify([])
+  );
+
   renderCart();
 }
 
-// 🔹 Event: Add to Cart
-productList.addEventListener("click", (e) => {
-  if (e.target.tagName === "BUTTON") {
-    const id = Number(e.target.dataset.id);
-    addToCart(id);
+
+
+// Add button click
+productList.addEventListener(
+  "click",
+  function(event) {
+
+    if(event.target.classList.contains("add-btn")) {
+
+      const id =
+        Number(event.target.dataset.id);
+
+      addToCart(id);
+
+    }
+
   }
-});
+);
 
-// 🔹 Event: Clear Cart
-clearCartBtn.addEventListener("click", clearCart);
 
-// 🔹 Initial render
+// Clear button click
+clearCartBtn.addEventListener(
+  "click",
+  clearCart
+);
+
+
+// Initial load
 renderProducts();
 renderCart();
