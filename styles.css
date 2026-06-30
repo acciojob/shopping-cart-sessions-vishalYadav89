@@ -1,4 +1,7 @@
-/*  your css code here. If applicable */
 body {
   font-family: Arial, sans-serif;
+}
+
+li {
+  margin: 10px;
 }
