@@ -1,3 +1,4 @@
+// Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
@@ -7,6 +8,7 @@ const products = [
 ];
 
 
+// DOM elements
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
@@ -14,23 +16,26 @@ const clearCartBtn = document.getElementById("clear-cart-btn");
 
 // Get cart from sessionStorage
 function getCart() {
+
   const cart = sessionStorage.getItem("cart");
 
-  if (cart) {
-    return JSON.parse(cart);
-  }
+  return cart ? JSON.parse(cart) : [];
 
-  return [];
 }
 
 
-// Save cart
+// Save cart to sessionStorage
 function saveCart(cart) {
-  sessionStorage.setItem("cart", JSON.stringify(cart));
+
+  sessionStorage.setItem(
+    "cart",
+    JSON.stringify(cart)
+  );
+
 }
 
 
-// Display products
+// Render products
 function renderProducts() {
 
   productList.innerHTML = "";
@@ -41,18 +46,19 @@ function renderProducts() {
 
     li.innerHTML = `
       ${product.name} - $${product.price}
-      <button class="add-btn" data-id="${product.id}">
+      <button data-id="${product.id}">
         Add to Cart
       </button>
     `;
 
     productList.appendChild(li);
+
   });
+
 }
 
 
-
-// Display cart
+// Render cart
 function renderCart() {
 
   const cart = getCart();
@@ -73,14 +79,13 @@ function renderCart() {
 }
 
 
-
-// Add product
+// Add product to cart
 function addToCart(id) {
 
-  const cart = getCart();
+  let cart = getCart();
 
   const product = products.find(
-    product => product.id === id
+    p => p.id === id
   );
 
 
@@ -94,8 +99,8 @@ function addToCart(id) {
   saveCart(cart);
 
   renderCart();
-}
 
+}
 
 
 // Clear cart
@@ -107,19 +112,20 @@ function clearCart() {
   );
 
   renderCart();
+
 }
 
 
-
-// Add button click
+// Add to cart button event
 productList.addEventListener(
   "click",
   function(event) {
 
-    if(event.target.classList.contains("add-btn")) {
+    if (event.target.tagName === "BUTTON") {
 
-      const id =
-        Number(event.target.dataset.id);
+      const id = Number(
+        event.target.getAttribute("data-id")
+      );
 
       addToCart(id);
 
@@ -129,13 +135,13 @@ productList.addEventListener(
 );
 
 
-// Clear button click
+// Clear button event
 clearCartBtn.addEventListener(
   "click",
   clearCart
 );
 
 
-// Initial load
+// Load page
 renderProducts();
 renderCart();
