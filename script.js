@@ -20,7 +20,14 @@ if (!sessionStorage.getItem("cart")) {
 
 // Get cart
 function getCart() {
-  return JSON.parse(sessionStorage.getItem("cart"));
+
+  let data = sessionStorage.getItem("cart");
+
+  if (!data) {
+    return [];
+  }
+
+  return JSON.parse(data);
 }
 
 
@@ -77,10 +84,9 @@ function renderCart() {
 }
 
 
-// Add product
 function addToCart(id) {
 
-  let cart = getCart();
+  let cart = getCart() || [];   // FIX: if null, create empty array
 
   let product = products.find(
     p => p.id === id
