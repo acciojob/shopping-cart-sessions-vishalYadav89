@@ -1,35 +1,27 @@
-// Product data
 const products = [
   { id: 1, name: "Product 1", price: 10 },
   { id: 2, name: "Product 2", price: 20 },
   { id: 3, name: "Product 3", price: 30 },
   { id: 4, name: "Product 4", price: 40 },
-  { id: 5, name: "Product 5", price: 50 }
+  { id: 5, name: "Product 5", price: 50 },
 ];
 
 
-// DOM elements
 const productList = document.getElementById("product-list");
 const cartList = document.getElementById("cart-list");
 const clearCartBtn = document.getElementById("clear-cart-btn");
 
 
-
-// Get cart
+// Do NOT reset sessionStorage here
 function getCart() {
 
   const data = sessionStorage.getItem("cart");
 
-  if (data === null) {
-    return [];
-  }
+  return data ? JSON.parse(data) : [];
 
-  return JSON.parse(data);
 }
 
 
-
-// Save cart
 function saveCart(cart) {
 
   sessionStorage.setItem(
@@ -41,7 +33,6 @@ function saveCart(cart) {
 
 
 
-// Render products
 function renderProducts() {
 
   productList.innerHTML = "";
@@ -50,11 +41,17 @@ function renderProducts() {
 
     const li = document.createElement("li");
 
+    const button = document.createElement("button");
+
+    button.innerText = "Add to Cart";
+    button.dataset.id = product.id;
+    button.className = "add-btn";
+
+
     li.innerHTML =
-      `${product.name} - $${product.price}
-       <button class="add-btn" data-id="${product.id}">
-       Add to Cart
-       </button>`;
+      `${product.name} - $${product.price} `;
+
+    li.appendChild(button);
 
     productList.appendChild(li);
 
@@ -64,13 +61,11 @@ function renderProducts() {
 
 
 
-// Render cart
 function renderCart() {
 
   cartList.innerHTML = "";
 
   const cart = getCart();
-
 
   cart.forEach(item => {
 
@@ -87,22 +82,16 @@ function renderCart() {
 
 
 
-// Add item to cart
 function addToCart(id) {
 
   let cart = getCart();
 
-
   const product = products.find(
-    product => product.id === id
+    p => p.id === id
   );
 
 
-  cart.push({
-    id: product.id,
-    name: product.name,
-    price: product.price
-  });
+  cart.push(product);
 
 
   saveCart(cart);
@@ -113,32 +102,13 @@ function addToCart(id) {
 
 
 
-// Clear cart
-function clearCart() {
-
-  sessionStorage.setItem(
-    "cart",
-    JSON.stringify([])
-  );
-
-  renderCart();
-
-}
-
-
-
-// Add button click
 productList.addEventListener(
   "click",
-  function(event) {
+  function(e) {
 
-    if (event.target.classList.contains("add-btn")) {
+    if(e.target.classList.contains("add-btn")) {
 
-      const id = Number(
-        event.target.dataset.id
-      );
-
-      addToCart(id);
+      addToCart(Number(e.target.dataset.id));
 
     }
 
@@ -147,14 +117,21 @@ productList.addEventListener(
 
 
 
-// Clear button click
 clearCartBtn.addEventListener(
   "click",
-  clearCart
+  function() {
+
+    sessionStorage.setItem(
+      "cart",
+      JSON.stringify([])
+    );
+
+    renderCart();
+
+  }
 );
 
 
 
-// Page load
 renderProducts();
 renderCart();
